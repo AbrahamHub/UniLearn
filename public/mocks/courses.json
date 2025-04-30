@@ -1,0 +1,37 @@
+{
+  "courses": [
+    {
+      "id": "1",
+      "title": "Introducción a HTML5",
+      "description": "Aprende los fundamentos de HTML5 desde cero. Este curso te guiará a través de los conceptos básicos hasta técnicas avanzadas.",
+      "thumbnail": "https://images.pexels.com/photos/1181671/pexels-photo-1181671.jpeg",
+      "status": "approved",
+      "authorId": "1",
+      "views": 1200,
+      "rating": 4.5,
+      "learningUnitIds": ["3"]
+    },
+    {
+      "id": "2",
+      "title": "JavaScript Moderno",
+      "description": "Domina JavaScript ES6+ y las últimas características del lenguaje más popular de la web.",
+      "thumbnail": "https://images.pexels.com/photos/4164418/pexels-photo-4164418.jpeg",
+      "status": "approved",
+      "authorId": "1",
+      "views": 850,
+      "rating": 4.8,
+      "learningUnitIds": ["1", "3"]
+    },
+    {
+      "id": "3",
+      "title": "React para Principiantes",
+      "description": "Inicia tu viaje en el desarrollo web moderno con React, la biblioteca más popular para crear interfaces de usuario.",
+      "thumbnail": "https://images.pexels.com/photos/11035471/pexels-photo-11035471.jpeg",
+      "status": "pending",
+      "authorId": "2",
+      "views": 0,
+      "rating": 0,
+      "learningUnitIds": ["3"]
+    }
+  ]
+}
