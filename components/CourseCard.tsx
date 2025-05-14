@@ -1,8 +1,9 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { BookOpen } from "lucide-react";
+import { BookOpen, Eye, ThumbsUp, ThumbsDown } from "lucide-react";
 import { urlFor } from "@/sanity/lib/image";
 import { Loader } from "@/components/ui/loader";
 import { CourseProgress } from "@/components/CourseProgress";
@@ -22,6 +23,32 @@ interface CourseCardProps {
 }
 
 export function CourseCard({ course, progress, href }: CourseCardProps) {
+  const [interactions, setInteractions] = useState({
+    views: 0,
+    likes: 0,
+    dislikes: 0,
+  });
+
+  useEffect(() => {
+    async function fetchInteractions() {
+      try {
+        // Se utiliza aggregate=1 para obtener la sumatoria de métricas por curso
+        const res = await fetch(`/api/lesson-interactions?courseId=${course._id}&aggregate=1`);
+        const data = await res.json();
+        setInteractions({
+          views: data.views || 0,
+          likes: data.likes || 0,
+          dislikes: data.dislikes || 0,
+        });
+      } catch (error) {
+        console.error("Error fetching interactions:", error);
+      }
+    }
+    if (course._id) {
+      fetchInteractions();
+    }
+  }, [course._id]);
+
   return (
     <Link
       href={href}
@@ -42,6 +69,17 @@ export function CourseCard({ course, progress, href }: CourseCardProps) {
               <Loader size="lg" />
             </div>
           )}
+          {/* Nueva etiqueta para mostrar vistas, likes y dislikes provenientes de la API */}
+          <div className="absolute top-4 right-4 bg-black/50 text-white px-2 py-1 rounded-full text-xs flex items-center">
+            <Eye className="w-4 h-4 mr-1" />
+            <span>{interactions.views}</span>
+            <span className="mx-1">|</span>
+            <ThumbsUp className="w-4 h-4 mr-1" />
+            <span>{interactions.likes}</span>
+            <span className="mx-1">|</span>
+            <ThumbsDown className="w-4 h-4 mr-1" />
+            <span>{interactions.dislikes}</span>
+          </div>
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
           <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
             <span className="text-sm font-medium px-3 py-1 bg-black/50 text-white rounded-full backdrop-blur-sm">
