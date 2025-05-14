@@ -19,7 +19,7 @@ export default async function Home() {
       <section className="container mx-auto px-4 py-8">
         <div className="flex items-center gap-4 mb-8">
           <div className="h-px flex-1 bg-gradient-to-r from-border/0 via-border to-border/0" />
-          <span className="text-2xl font-bold text-green-600 dark:text-green-500">Cursos Destacados</span>
+          <span className="text-2xl font-bold text-green-600 dark:text-green-500">Cursos Sugeridos</span>
           {/* Cambiado a texto más grande y color verde */}
           <div className="h-px flex-1 bg-gradient-to-r from-border/0 via-border to-border/0" />
         </div>
