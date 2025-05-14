@@ -1,10 +1,10 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { ThumbsUp, ThumbsDown } from "lucide-react";
 
-interface Props {
+interface LikeDislikeButtonsProps {
   courseId: string;
   lessonId: string;
-  userId: string;
   initialLikeCount?: number;
   initialDislikeCount?: number;
 }
@@ -12,15 +12,52 @@ interface Props {
 export default function LikeDislikeButtons({
   courseId,
   lessonId,
-  userId,
   initialLikeCount = 0,
   initialDislikeCount = 0,
-}: Props) {
+}: LikeDislikeButtonsProps) {
   const [selection, setSelection] = useState<"like" | "dislike" | null>(null);
   const [likeCount, setLikeCount] = useState(initialLikeCount);
   const [dislikeCount, setDislikeCount] = useState(initialDislikeCount);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Obtener el userId de la sesión del cliente
+  const [userId, setUserId] = useState<string | null>(null);
+  
+  useEffect(() => {
+    // Este es un enfoque simple para obtener el ID del usuario en el cliente
+    // En una implementación real, podrías usar useClerk() o similar
+    const getUserId = async () => {
+      try {
+        const response = await fetch('/api/auth/me');
+        if (response.ok) {
+          const data = await response.json();
+          setUserId(data.id);
+          
+          // Si tenemos el userId, obtener el estado actual de like/dislike
+          if (data.id) {
+            const statsResponse = await fetch(
+              `/api/lesson-interactions?courseId=${courseId}&lessonId=${lessonId}&userId=${data.id}`
+            );
+            if (statsResponse.ok) {
+              const statsData = await statsResponse.json();
+              setSelection(statsData.userReaction);
+              setLikeCount(statsData.likes);
+              setDislikeCount(statsData.dislikes);
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching user data", error);
+      }
+    };
+    
+    getUserId();
+  }, [courseId, lessonId]);
 
-  const updateApi = async (action: "like" | "dislike") => {
+  const updateInteraction = async (action: "like" | "dislike") => {
+    if (!userId) return;
+    setIsLoading(true);
+    
     try {
       const res = await fetch(
         `/api/lesson-interactions?courseId=${courseId}&lessonId=${lessonId}&userId=${userId}`,
@@ -30,62 +67,56 @@ export default function LikeDislikeButtons({
           body: JSON.stringify({ action }),
         }
       );
-      const data = await res.json();
+      
       if (res.ok) {
+        const data = await res.json();
         setLikeCount(data.likes);
         setDislikeCount(data.dislikes);
+        setSelection(data.userReaction);
       }
     } catch (error) {
-      console.error("Error updating API", error);
+      console.error("Error updating interaction", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleLike = async () => {
-    if (selection === "like") {
-      // Implementar "undo" si la API lo admite, de lo contrario se puede dejar bloqueado
-      setSelection(null);
-      setLikeCount((prev) => prev - 1);
-    } else {
-      if (selection === "dislike") {
-        setDislikeCount((prev) => prev - 1);
-      }
-      setSelection("like");
-      await updateApi("like");
-    }
+  const handleLike = () => {
+    if (isLoading || !userId) return;
+    updateInteraction("like");
   };
 
-  const handleDislike = async () => {
-    if (selection === "dislike") {
-      setSelection(null);
-      setDislikeCount((prev) => prev - 1);
-    } else {
-      if (selection === "like") {
-        setLikeCount((prev) => prev - 1);
-      }
-      setSelection("dislike");
-      await updateApi("dislike");
-    }
+  const handleDislike = () => {
+    if (isLoading || !userId) return;
+    updateInteraction("dislike");
   };
 
   return (
-    <div className="flex space-x-4 mt-4">
+    <div className="flex items-center space-x-4">
       <button
         onClick={handleLike}
-        disabled={selection === "dislike"}
-        className={`bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded disabled:opacity-50 disabled:cursor-not-allowed ${
-          selection === "like" ? "ring-2 ring-blue-300" : ""
+        disabled={isLoading}
+        className={`flex items-center gap-2 px-3 py-1 rounded transition-all ${
+          selection === "like"
+            ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+            : "bg-muted hover:bg-muted/80"
         }`}
       >
-        <span role="img" aria-label="Like">👍</span> {likeCount}
+        <ThumbsUp className="h-4 w-4" />
+        <span>{likeCount}</span>
       </button>
+      
       <button
         onClick={handleDislike}
-        disabled={selection === "like"}
-        className={`bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded disabled:opacity-50 disabled:cursor-not-allowed ${
-          selection === "dislike" ? "ring-2 ring-red-300" : ""
+        disabled={isLoading}
+        className={`flex items-center gap-2 px-3 py-1 rounded transition-all ${
+          selection === "dislike"
+            ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+            : "bg-muted hover:bg-muted/80"
         }`}
       >
-        <span role="img" aria-label="Dislike">👎</span> {dislikeCount}
+        <ThumbsDown className="h-4 w-4" />
+        <span>{dislikeCount}</span>
       </button>
     </div>
   );
