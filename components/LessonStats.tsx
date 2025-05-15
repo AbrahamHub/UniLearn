@@ -35,17 +35,7 @@ export default function LessonStats({ courseId, lessonId, userId }: { courseId: 
       `/api/lesson-interactions?courseId=${courseId}&lessonId=${lessonId}`,
       { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "view" }) }
     );
-  }, []);
-
-  // Manejar like/dislike
-  const handleReaction = (action: "like" | "dislike") => {
-    fetch(
-      `/api/lesson-interactions?courseId=${courseId}&lessonId=${lessonId}&userId=${userId}`,
-      { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action }) }
-    )
-      .then(res => res.json())
-      .then(data => setStats(data));
-  };
+  }, [courseId, lessonId]);
 
   // Manejar comentario
   const handleComment = () => {
@@ -73,9 +63,10 @@ export default function LessonStats({ courseId, lessonId, userId }: { courseId: 
         <span>👎 {stats.dislikes}</span>
       </div>
       <LikeDislikeButtons
-        selection={stats.userReaction}
-        onLike={() => handleReaction("like")}
-        onDislike={() => handleReaction("dislike")}
+        courseId={courseId}
+        lessonId={lessonId}
+        initialLikeCount={stats.likes}
+        initialDislikeCount={stats.dislikes}
       />
       <div>
         <textarea

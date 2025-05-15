@@ -4,6 +4,25 @@ import { currentUser } from "@clerk/nextjs/server";
 
 const COLLECTION = "lessonStats";
 
+// Tipado para los documentos de la colección
+interface Reaction {
+  userId: string;
+  type: string;
+  createdAt: Date;
+}
+interface Comment {
+  userId: string;
+  text: string;
+  createdAt: string | Date;
+}
+interface LessonStatsDoc {
+  courseId: string;
+  lessonId: string;
+  views: number;
+  reactions: Reaction[];
+  comments: Comment[];
+}
+
 // Helper para obtener parámetros de la URL
 async function getParams(req: NextRequest) {
   const url = new URL(req.url);
@@ -17,7 +36,8 @@ async function getParams(req: NextRequest) {
   if (!lessonId && !aggregate) {
     throw { status: 400, message: "El parámetro lessonId es obligatorio si no se usa aggregate" };
   }
-  return { courseId, lessonId, userId, aggregate };
+  // Forzar a string (ya validado)
+  return { courseId: courseId as string, lessonId: lessonId as string | undefined, userId, aggregate };
 }
 
 // GET - Obtener estadísticas
@@ -28,7 +48,7 @@ export async function GET(req: NextRequest) {
     // Conectar a MongoDB
     const client = await clientPromise;
     const db = client.db();
-    const collection = db.collection(COLLECTION);
+    const collection = db.collection<LessonStatsDoc>(COLLECTION);
     
     if (aggregate) {
       // Agregar estadísticas para todo el curso contando todas las lecciones
@@ -66,16 +86,19 @@ export async function GET(req: NextRequest) {
       // Buscar el documento usando courseId y lessonId
       const doc = await collection.findOne({ courseId, lessonId });
       const base = doc || { courseId, lessonId, reactions: [], views: 0, comments: [] };
-      const likes = base.reactions?.filter((r: any) => r.type === "like").length || 0;
-      const dislikes = base.reactions?.filter((r: any) => r.type === "dislike").length || 0;
+      const likes = base.reactions?.filter((r: unknown) => (r as { type: string }).type === "like").length || 0;
+      const dislikes = base.reactions?.filter((r: unknown) => (r as { type: string }).type === "dislike").length || 0;
       const userReaction = userId && base.reactions
-        ? base.reactions.find((r: any) => r.userId === userId)?.type || null
+        ? base.reactions.find((r: unknown) => (r as { userId: string }).userId === userId)?.type || null
         : null;
-      const comments = (base.comments || []).map((c: any) => ({
-        userId: c.userId,
-        text: c.text,
-        createdAt: c.createdAt instanceof Date ? c.createdAt.toISOString() : c.createdAt,
-      }));
+      const comments = (base.comments || []).map((c: unknown) => {
+        const comment = c as { userId: string; text: string; createdAt: string | Date };
+        return {
+          userId: comment.userId,
+          text: comment.text,
+          createdAt: comment.createdAt instanceof Date ? comment.createdAt.toISOString() : comment.createdAt,
+        };
+      });
       return NextResponse.json({
         courseId,
         lessonId,
@@ -86,11 +109,12 @@ export async function GET(req: NextRequest) {
         comments,
       });
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { message?: string; status?: number };
     console.error("Error in GET /api/lesson-interactions:", error);
     return NextResponse.json(
-      { error: error.message || "Error interno del servidor" }, 
-      { status: error.status || 500 }
+      { error: err.message || "Error interno del servidor" }, 
+      { status: err.status || 500 }
     );
   }
 }
@@ -126,7 +150,7 @@ export async function PATCH(req: NextRequest) {
     // Conectar a MongoDB
     const client = await clientPromise;
     const db = client.db();
-    const collection = db.collection(COLLECTION);
+    const collection = db.collection<LessonStatsDoc>(COLLECTION);
     
     // Asegurar que existe un documento para esta lección usando courseId y lessonId
     await collection.updateOne(
@@ -218,16 +242,19 @@ export async function PATCH(req: NextRequest) {
     
     // Calcular estadísticas actualizadas
     const reactions = updated.reactions || [];
-    const likes = reactions.filter((r: any) => r.type === "like").length;
-    const dislikes = reactions.filter((r: any) => r.type === "dislike").length;
-    const userReaction = reactions.find((r: any) => r.userId === actualUserId)?.type || null;
+    const likes = reactions.filter((r: unknown) => (r as { type: string }).type === "like").length;
+    const dislikes = reactions.filter((r: unknown) => (r as { type: string }).type === "dislike").length;
+    const userReaction = reactions.find((r: unknown) => (r as { userId: string }).userId === actualUserId)?.type || null;
     
     // Formatear comentarios
-    const comments = (updated.comments || []).map((c: any) => ({
-      userId: c.userId,
-      text: c.text,
-      createdAt: c.createdAt instanceof Date ? c.createdAt.toISOString() : c.createdAt,
-    }));
+    const comments = (updated.comments || []).map((c: unknown) => {
+      const comment = c as { userId: string; text: string; createdAt: string | Date };
+      return {
+        userId: comment.userId,
+        text: comment.text,
+        createdAt: comment.createdAt instanceof Date ? comment.createdAt.toISOString() : comment.createdAt,
+      };
+    });
     
     // Devolver respuesta actualizada
     return NextResponse.json({
@@ -240,11 +267,12 @@ export async function PATCH(req: NextRequest) {
       comments,
     });
     
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { message?: string; status?: number };
     console.error("Error in PATCH /api/lesson-interactions:", error);
     return NextResponse.json(
-      { error: error.message || "Error interno del servidor" }, 
-      { status: error.status || 500 }
+      { error: err.message || "Error interno del servidor" }, 
+      { status: err.status || 500 }
     );
   }
 }

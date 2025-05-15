@@ -9,6 +9,7 @@ interface Comment {
   userId: string;
   text: string;
   createdAt: string;
+  userName?: string;
 }
 
 interface LessonStats {
