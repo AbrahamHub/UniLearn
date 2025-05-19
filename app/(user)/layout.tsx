@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import { ClerkProvider } from "@clerk/nextjs";
 
 export const metadata: Metadata = {
-  title: "UniLern",
+  title: "UniLearn",
   description: "Plataforma de aprendizaje en línea",
   icons: {
     icon: "/favicon.ico",

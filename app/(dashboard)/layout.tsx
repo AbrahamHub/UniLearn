@@ -6,7 +6,7 @@ import { esES } from "@clerk/localizations";
 import { SidebarProvider } from "@/components/providers/sidebar-provider";
 
 export const metadata: Metadata = {
-  title: "UniLern",
+  title: "UniLearn",
   description: "Plataforma de aprendizaje en línea",
   icons: {
     icon: "/favicon.ico",
