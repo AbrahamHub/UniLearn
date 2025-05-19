@@ -3,6 +3,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { SanityLive } from "@/sanity/lib/live";
 import Header from "@/components/Header";
 import { ClerkProvider } from "@clerk/nextjs";
+import { esES } from "@clerk/localizations";
 
 export const metadata: Metadata = {
   title: "UniLearn",
@@ -20,7 +21,7 @@ export default function UserLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider localization={esES}>
       <ThemeProvider
         attribute="class"
         defaultTheme="system"
