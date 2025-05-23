@@ -2,20 +2,20 @@ import { defineField, defineType } from "sanity";
 
 export const courseType = defineType({
   name: "course",
-  title: "Course",
+  title: "Curso",
   type: "document",
   fields: [
     defineField({
       name: "title",
-      title: "Title",
+      title: "Título",
       type: "string",
       validation: (rule) => rule.required(),
     }),
     {
       name: "price",
-      title: "Price (USD)",
+      title: "Precio (USD)",
       type: "number",
-      description: "Price in USD",
+      description: "Precio en USD",
       validation: (Rule) => Rule.min(0),
     },
     defineField({
@@ -30,24 +30,24 @@ export const courseType = defineType({
     }),
     defineField({
       name: "description",
-      title: "Description",
+      title: "Descripción",
       type: "text",
     }),
     defineField({
       name: "image",
-      title: "Course Image",
+      title: "Imagen del Curso",
       type: "image",
     }),
     defineField({
       name: "category",
-      title: "Category",
+      title: "Categoría",
       type: "reference",
       to: [{ type: "category" }],
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: "modules",
-      title: "Modules",
+      title: "Módulos",
       type: "array",
       of: [{ type: "reference", to: { type: "module" } }],
     }),

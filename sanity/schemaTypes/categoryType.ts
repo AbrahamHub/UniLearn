@@ -2,12 +2,12 @@ import { defineField, defineType } from "sanity";
 
 export const categoryType = defineType({
   name: "category",
-  title: "Category",
+  title: "Categoría",
   type: "document",
   fields: [
     defineField({
       name: "name",
-      title: "Name",
+      title: "Nombre",
       type: "string",
       validation: (rule) => rule.required(),
     }),
@@ -23,20 +23,20 @@ export const categoryType = defineType({
     }),
     defineField({
       name: "description",
-      title: "Description",
+      title: "Descripción",
       type: "text",
     }),
     defineField({
       name: "icon",
-      title: "Icon",
+      title: "Ícono",
       type: "string",
-      description: "Icon identifier (e.g., for using with icon libraries)",
+      description: "Identificador de ícono (por ejemplo, para usar con librerías de íconos)",
     }),
     defineField({
       name: "color",
       title: "Color",
       type: "string",
-      description: "Color code for the category (e.g., #FF0000)",
+      description: "Código de color para la categoría (por ejemplo, #FF0000)",
     }),
   ],
 });

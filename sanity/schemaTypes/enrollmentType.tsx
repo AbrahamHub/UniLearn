@@ -3,40 +3,40 @@ import { defineField, defineType } from "sanity";
 
 export const enrollmentType = defineType({
   name: "enrollment",
-  title: "Enrollment",
+  title: "Inscripción",
   type: "document",
   fields: [
     defineField({
       name: "student",
-      title: "Student",
+      title: "Estudiante",
       type: "reference",
       to: [{ type: "student" }],
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: "course",
-      title: "Course",
+      title: "Curso",
       type: "reference",
       to: [{ type: "course" }],
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: "amount",
-      title: "Amount",
+      title: "Monto",
       type: "number",
       validation: (rule) => rule.required().min(0),
-      description: "The amount paid for the course enrollment in cents",
+      description: "El monto pagado por la inscripción al curso en centavos",
     }),
     defineField({
       name: "paymentId",
-      title: "Payment ID",
+      title: "ID de Pago",
       type: "string",
       validation: (rule) => rule.required(),
-      description: "The Stripe payment/checkout session ID",
+      description: "El ID de pago/sesión de Stripe",
     }),
     defineField({
       name: "enrolledAt",
-      title: "Enrolled At",
+      title: "Inscrito el",
       type: "datetime",
       initialValue: () => new Date().toISOString(),
     }),

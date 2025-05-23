@@ -4,40 +4,40 @@ import { urlFor } from "../lib/image";
 
 export const lessonCompletionType = defineType({
   name: "lessonCompletion",
-  title: "Lesson Completion",
+  title: "Lección Completada",
   type: "document",
   fields: [
     defineField({
       name: "student",
-      title: "Student",
+      title: "Estudiante",
       type: "reference",
       to: [{ type: "student" }],
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: "lesson",
-      title: "Lesson",
+      title: "Lección",
       type: "reference",
       to: [{ type: "lesson" }],
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: "module",
-      title: "Module",
+      title: "Módulo",
       type: "reference",
       to: [{ type: "module" }],
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: "course",
-      title: "Course",
+      title: "Curso",
       type: "reference",
       to: [{ type: "course" }],
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: "completedAt",
-      title: "Completed At",
+      title: "Completado el",
       type: "datetime",
       validation: (rule) => rule.required(),
     }),
@@ -51,7 +51,7 @@ export const lessonCompletionType = defineType({
     },
     prepare({ courseTitle, lessonTitle, completedAt, courseImage }) {
       return {
-        title: `${courseTitle || "Course"}: "${lessonTitle || "Lesson"}"`,
+        title: `${courseTitle || "Curso"}: "${lessonTitle || "Lección"}"`,
         subtitle: completedAt ? new Date(completedAt).toLocaleDateString() : "",
         media: (
           <Image

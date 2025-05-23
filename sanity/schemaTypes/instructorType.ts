@@ -7,18 +7,18 @@ export const instructorType = defineType({
   fields: [
     defineField({
       name: "name",
-      title: "Name",
+      title: "Nombre",
       type: "string",
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: "bio",
-      title: "Bio",
+      title: "Biografía",
       type: "text",
     }),
     defineField({
       name: "photo",
-      title: "Photo",
+      title: "Foto",
       type: "image",
     }),
   ],
