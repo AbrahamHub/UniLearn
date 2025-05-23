@@ -172,7 +172,7 @@ export async function PATCH(req: NextRequest) {
       // Incrementar contador de vistas usando courseId y lessonId (solo se aumenta en +1)
       await collection.updateOne(
         { courseId, lessonId },
-        { $inc: { views: (1/2) } }
+        { $inc: { views: 1 } }
       );
     } 
     else if (action === "like" || action === "dislike") {
